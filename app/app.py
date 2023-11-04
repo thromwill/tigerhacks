@@ -1,27 +1,22 @@
 from flask import Flask, render_template, request
 import mysql.connector, random
-import openai
 import config as c
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from pptx import Presentation
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import credentials, firestore
 
-openai.organization = c.openai_org_id
-openai.api_key = c.openai_secret_key
+cred = credentials.Certificate('firebase_secret_key.json')
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 app = Flask(__name__)
 app.secret_key = c.flask_secret_key
-
-DATABASE_TABLE = 'question'
-db = mysql.connector.connect(
-    host = c.mysql_hostname,
-    user = c.mysql_username,
-    password = c.mysql_password,
-    database = c.mysql_database
-)
-cursor = db.cursor()
 
 TYPES = {
     'Movies' : 1,
@@ -79,13 +74,18 @@ def submit():
     return "Form submitted successfully!"
 
 def get_questions(n, type, genre, difficulty):
+    questions_ref = db.collection('questions')
+    query = questions_ref.where('Type', '==', type).where('Genre', '==', genre).where('Difficulty', '==', difficulty).stream()
 
-    cursor.execute(
-        f"SELECT * FROM {DATABASE_TABLE} WHERE Genre = %s AND Type = %s AND Difficulty = %s",
-        (type, genre, difficulty)
-    )
+    question_list = []
+    for doc in query:
+        question_data = doc.to_dict()
+        question_list.append({
+            'content': question_data.get('Content'),
+            'answer': question_data.get('Answer')
+        })
 
-    return [{'content': row[4], 'answer': row[5]} for row in random.sample(cursor.fetchall(), n)]
+    return random.sample(question_list, n)
 
 def export_pdf(questions):
     doc = SimpleDocTemplate('TigerHacksTrivia.pdf', pagesize=letter)
@@ -126,27 +126,5 @@ def export_ppt(questions):
 
   prs.save('TigerHacksTrivia.pptx')
 
-def gpt_api():
-    pass
-    # prompt = "tell me a joke"
-
-    # # Make the API request
-    # response = openai.Completion.create(
-    #     engine="davinci",
-    #     prompt=prompt,
-    #     max_tokens=50,  # Adjust max tokens as needed
-    # )
-
-    # print(response)
-    # print()
-    # joke = response.choices[0].text.strip()
-    # print(joke)
-
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
