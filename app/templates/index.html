@@ -105,46 +105,34 @@
 
     <form method="POST" action="/submit">
         <div class="blackSquare">
-            <label for="number">Number of Questions (1-5)</label>
+            <label for="number">Number of Questions</label>
             <input type="number" name="number" required>
         </div>
         <div class="goldSquare">
-            <label for="style">Media Style</label>
-            <input type="text" list="style" name="style" required>
-            <datalist id="style">
-              <option value="Any">
+            <label for="type">Type</label>
+            <input type="text" list="type" name="type" required>
+            <datalist id="type">
               <option value="Movies">
               <option value="TV">
               <option value="Books">
               <option value="Games">
-              <option value="Social">
-              <option value="Internet">
          </datalist>
         </div>
         <div class="blackSquare">
-            <label for="genre">Genres</label>
+            <label for="genre">Genre</label>
             <input type="text" list="genre" name="genre" required>
             <datalist id="genre">
-              <option value="Any">
               <option value="Action">
               <option value="Comedy">
-              <option value="Documentary">
-              <option value="Drama">
-              <option value="Fantasy">
               <option value="Horror">
-              <option value="Musical">
-              <option value="Mystery">
               <option value="Romance">
-              <option value="Science Fiction">
-              <option value="Thriller">
-              <option value="Western">
+              <option value="Fantasy">
             </datalist>
         </div>
         <div class="goldSquare">
-            <label for="difficulty">Choose Difficulty</label>
+            <label for="difficulty"> Difficulty</label>
             <input type="text" list="difficulty" name="difficulty" required>
             <datalist id="difficulty">
-              <option value="Any">
               <option value="Easy">
               <option value="Medium">
               <option value="Hard">
